@@ -10,3 +10,4 @@ pip install tokenizers>=0.10.2
 pip install tqdm==4.58.0
 pip install apex==0.1
 pip install six==1.16.0
+pip install datasets
