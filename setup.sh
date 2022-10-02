@@ -11,3 +11,4 @@ pip install tqdm==4.58.0
 pip install apex==0.1
 pip install six==1.16.0
 pip install datasets
+pip install protobuf==3.20.1
