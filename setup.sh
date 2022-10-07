@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-conda install pytorch torchvision torchaudio -c pytorch
+conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
 pip install numpy>=1.18
 pip install pydantic==1.7.4
 pip install pyserini>=0.16.0
