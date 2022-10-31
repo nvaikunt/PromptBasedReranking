@@ -88,4 +88,4 @@ class CustomTrainer(Seq2SeqTrainer):
         margin_loss = torch.nn.MarginRankingLoss(margin)
         loss = margin_loss(pos_loss, neg_loss, torch.tensor(-1))
 
-        return loss
+        return (loss, outputs) if return_outputs else loss
