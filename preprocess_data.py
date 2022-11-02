@@ -27,7 +27,7 @@ def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz:
         data_sz = len(full_dataset)
     train_dict = train_creation_fct(full_dataset, n=data_sz)
     train_dataset = datasets.Dataset.from_dict(train_dict)
-    train_dataset = train_dataset.map(partial(preprocess_function, tokenizer, max_input_length=300,
+    train_dataset = train_dataset.map(partial(preprocess_function, tokenizer=tokenizer, max_input_length=300,
                                               max_target_length=50, input_col='inputs'), batched=True)
     train_dataset = train_dataset.remove_columns(["inputs", "targets", drop_col])
     train_dataset.set_format(type="torch")
