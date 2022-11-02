@@ -10,7 +10,7 @@ def train(args: argparse.Namespace):
     model_ckpt, train_dir, valid_dir, evidence_dir = args.model_ckpt, \
                                                      args.train_dir, args.val_dir, args.evidence_dir
     tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
-    model = T5ForConditionalGeneration(model_ckpt)
+    model = T5ForConditionalGeneration.from_pretrained(model_ckpt)
 
     batch_size = args.batch_size
     isQG = args.isQG
