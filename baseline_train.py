@@ -7,15 +7,16 @@ _truth_ix = 1176
 
 
 def train(args: argparse.Namespace):
-    model_ckpt, train_dir, valid_dir, evidence_dir = args.m, args.tdir, args.vdir, args.edir
+    model_ckpt, train_dir, valid_dir, evidence_dir = args.model_ckpt, \
+                                                     args.train_dir, args.val_dir, args.evidence_dir
     tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     model = T5ForConditionalGeneration(model_ckpt)
 
-    batch_size = args.bs
+    batch_size = args.batch_size
     isQG = args.isQG
     isRanking = args.isRanking
-    train_data_sz = args.trsz
-    validation_data_sz = args.vlsz
+    train_data_sz = args.max_train_size
+    validation_data_sz = args.max_val_size
 
     train_dataset = create_training_dataset(train_dir, evidence_dir, train_data_sz,
                                             isQG, isRanking, batch_size, tokenizer)
@@ -23,9 +24,9 @@ def train(args: argparse.Namespace):
                                                  isQG, isRanking, batch_size, tokenizer)
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
 
-    num_epochs = args.ep
-    learning_rate = args.lr
-    output_dir = args.odir
+    num_epochs = args.num_epochs
+    learning_rate = args.learning_rate
+    output_dir = args.outdir
 
     training_args = Seq2SeqTrainingArguments(
         output_dir=output_dir,
