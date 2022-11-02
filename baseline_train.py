@@ -75,12 +75,12 @@ if __name__ == "__main__":
                         help="Indicates whether Ranking loss or Cross Entropy loss is being used")
     parser.add_argument("-ep", "--num_epochs", type=int, required=True, default=3,
                         help="Number of Epochs to Train for")
-    parser.add_argument("-bs", "--batch_size", type=int, required=True, default=10, help="Batch Size")
-    parser.add_argument("-lr", "--learning_rate", type=float, required=True, default=5e-4, help="Learning Rate")
-    parser.add_argument("-ngpu", "--num_gpu", type=int, required=True, default=1, help="number of GPUs to be used")
-    parser.add_argument("-trsz", "--max_train_size", type=int, required=True, default=80000,
+    parser.add_argument("-bs", "--batch_size", type=int, required=False, default=10, help="Batch Size")
+    parser.add_argument("-lr", "--learning_rate", type=float, required=False, default=5e-4, help="Learning Rate")
+    parser.add_argument("-ngpu", "--num_gpu", type=int, required=False, default=1, help="number of GPUs to be used")
+    parser.add_argument("-trsz", "--max_train_size", type=int, required=False, default=80000,
                         help="Max number of questions to be considered in training set")
-    parser.add_argument("-vlsz", "--max_val_size", type=int, required=True, default=9000,
+    parser.add_argument("-vlsz", "--max_val_size", type=int, required=False, default=9000,
                         help="Max number of questions to be considered in validation set")
     parser.add_argument("-odir", "--outdir", type=str, required=True, default="baseline-qg-ce",
                         help="Directory where Training Outputs will be saved to")
@@ -90,7 +90,7 @@ if __name__ == "__main__":
                         help="Directory where Train Data will be saved to")
     parser.add_argument("-vdir", "--val_dir", type=str, required=True,
                         help="Directory where Validation Data will be saved to")
-    parser.add_argument("-m", "--model_ckpt", type=str, required=False, default="google/t5-base-ln-adapt",
+    parser.add_argument("-m", "--model_ckpt", type=str, required=False, default="google/t5-base-lm-adapt",
                         help="Checkpoint to start training from")
     parser.add_argument("--do_eval", action='store_true',
                         help="Evaluated at the end of training")
