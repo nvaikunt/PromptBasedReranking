@@ -60,10 +60,10 @@ def preprocess_function(examples, tokenizer,
     model_inputs = tokenizer(
         examples[input_col],
         max_length=max_input_length,
-        truncation=True,  padding="longest"
-    )
-    labels = tokenizer(text_target=examples["targets"], max_length=max_target_length, truncation=True,  padding="longest", return_tensors="pt"
-    )
+        truncation=True)
+#       padding="longest")
+    labels = tokenizer(text_target=examples["targets"], max_length=max_target_length, truncation=True)
+#                       padding="longest", return_tensors="pt")
     model_inputs["labels"] = labels["input_ids"]
     model_inputs["decoder_attention_mask"] = labels["attention_mask"]
     return model_inputs

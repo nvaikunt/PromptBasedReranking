@@ -1,4 +1,5 @@
 import datasets
+from datasets.utils import disable_progress_bar
 from functools import partial
 from transformers import PreTrainedTokenizerBase
 from utils.data_utils import create_evidence_texts, create_pos_txt_col, create_pos_neg_txt_col, preprocess_function
@@ -7,7 +8,9 @@ from utils.train_utils import create_q_gen_baseline_examples, create_ranking_los
 
 
 def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz: int, isQG: bool, isRanking:bool,
-                            batch_sz: int, tokenizer: PreTrainedTokenizerBase) -> datasets.Dataset:
+                            batch_sz: int, tokenizer: PreTrainedTokenizerBase, map_verbose: bool) -> datasets.Dataset:
+    if not map_verbose:
+        disable_progress_bar()
     evidence_txt = create_evidence_texts(evidence_filepath)
     full_dataset = datasets.load_dataset("json", data_files=data_filepath, split="train")
     full_dataset = full_dataset.map(partial(create_pos_txt_col, k=batch_sz,
@@ -30,7 +33,7 @@ def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz:
     train_dataset = train_dataset.map(partial(preprocess_function, tokenizer=tokenizer, max_input_length=300,
                                               max_target_length=50, input_col='inputs'), batched=True)
     train_dataset = train_dataset.remove_columns(["inputs", "targets", drop_col])
-    train_dataset.set_format(type="torch")
+    # train_dataset.set_format(type="torch")
     return train_dataset
 
 

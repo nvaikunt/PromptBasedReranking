@@ -19,9 +19,11 @@ def train(args: argparse.Namespace):
     validation_data_sz = args.max_val_size
 
     train_dataset = create_training_dataset(train_dir, evidence_dir, train_data_sz,
-                                            isQG, isRanking, batch_size, tokenizer)
+                                            isQG, isRanking, batch_size, tokenizer,
+                                            args.dataset_verbose)
     validation_dataset = create_training_dataset(valid_dir, evidence_dir, validation_data_sz,
-                                                 isQG, isRanking, batch_size, tokenizer)
+                                                 isQG, isRanking, batch_size, tokenizer,
+                                                 args.dataset_verbose)
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
 
     num_epochs = args.num_epochs
@@ -94,5 +96,7 @@ if __name__ == "__main__":
                         help="Checkpoint to start training from")
     parser.add_argument("--do_eval", action='store_true',
                         help="Evaluated at the end of training")
+    parser.add_argument("--dataset_verbose", action='store_true',
+                        help="Print Progress Bars for Dataset Map function")
     arguments = parser.parse_args()
     main(arguments)
