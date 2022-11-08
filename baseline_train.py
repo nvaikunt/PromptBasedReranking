@@ -42,6 +42,7 @@ def train(args: argparse.Namespace):
         num_train_epochs=num_epochs,
         push_to_hub=True
     )
+    print(isQG, isRanking)
     if not isRanking:
         trainer = Seq2SeqTrainer(
             model,
