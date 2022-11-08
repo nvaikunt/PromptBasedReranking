@@ -92,11 +92,11 @@ class CustomTrainer(Seq2SeqTrainer):
             neg_loss = ce_loss(neg_outputs.view(-1, flat_size), labels[pos_end:, :].view(-1))
         else:
             pos_outputs = pos_outputs[:, 0, :]
-            neg_outputs = pos_outputs[:, 0, :]
+            neg_outputs = neg_outputs[:, 0, :]
             true_ids = torch.ones(pos_end)
             pos_loss = ce_loss(pos_outputs.view(-1, flat_size), true_ids)
             neg_loss = ce_loss(neg_outputs.view(-1, flat_size), true_ids)
-            print(pos_loss, neg_loss)
+
 
         margin_loss = torch.nn.MarginRankingLoss(margin)
         loss = margin_loss(pos_loss, neg_loss, torch.tensor(-1))
