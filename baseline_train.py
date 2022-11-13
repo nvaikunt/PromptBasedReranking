@@ -40,9 +40,10 @@ def train(args: argparse.Namespace):
         save_total_limit=3,
         logging_strategy="epoch",
         num_train_epochs=num_epochs,
+        hub_token=args.hub_token,
         push_to_hub=True
     )
-    print(isQG, isRanking)
+
     if not isRanking:
         trainer = Seq2SeqTrainer(
             model,
@@ -62,6 +63,7 @@ def train(args: argparse.Namespace):
             tokenizer=tokenizer
         )
     trainer.train()
+    trainer.push_to_hub(commit_message=f'{args.run_name}')
     if args.do_eval:
         trainer.evaluate()
 
@@ -99,5 +101,9 @@ if __name__ == "__main__":
                         help="Evaluated at the end of training")
     parser.add_argument("--dataset_verbose", action='store_true',
                         help="Print Progress Bars for Dataset Map function")
+    parser.add_argument("--run_name", type=str, required=True,
+                        help="Run Name")
+    parser.add_argument("--hub_token", type=str, required=False, default="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",
+                        help="Run Name")
     arguments = parser.parse_args()
     main(arguments)
