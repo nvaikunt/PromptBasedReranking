@@ -12,11 +12,17 @@ def train(args: argparse.Namespace):
     tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     model = T5ForConditionalGeneration.from_pretrained(model_ckpt)
 
-    batch_size = args.batch_size
-    isQG = args.isQG
-    isRanking = args.isRanking
-    train_data_sz = args.max_train_size
-    validation_data_sz = args.max_val_size
+    batch_size = int(args.batch_size)
+    if args.isQG == "True":
+        isQG = True
+    else:
+        isQG = False
+    if args.isRanking == "True":
+        isRanking = True
+    else:
+        isRanking = False
+    train_data_sz = int(args.max_train_size)
+    validation_data_sz = int(args.max_val_size)
 
     train_dataset = create_training_dataset(train_dir, evidence_dir, train_data_sz,
                                             isQG, isRanking, batch_size, tokenizer,
@@ -26,8 +32,8 @@ def train(args: argparse.Namespace):
                                                  args.dataset_verbose)
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
 
-    num_epochs = args.num_epochs
-    learning_rate = args.learning_rate
+    num_epochs = int(args.num_epochs)
+    learning_rate = float(args.learning_rate)
     output_dir = args.outdir
 
     training_args = Seq2SeqTrainingArguments(
@@ -74,18 +80,18 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--isQG", action='store_false',
+    parser.add_argument("--isQG", type=str, required=False, default="True",
                         help="Indicates whether model will be trained with Question Generation objective")
-    parser.add_argument("--isRanking", action='store_true',
+    parser.add_argument("--isRanking", type=str, required=False, default="False",
                         help="Indicates whether Ranking loss or Cross Entropy loss is being used")
-    parser.add_argument("-ep", "--num_epochs", type=int, required=True, default=3,
+    parser.add_argument("-ep", "--num_epochs", type=str, required=True, default=3,
                         help="Number of Epochs to Train for")
-    parser.add_argument("-bs", "--batch_size", type=int, required=False, default=10, help="Batch Size")
-    parser.add_argument("-lr", "--learning_rate", type=float, required=False, default=5e-4, help="Learning Rate")
-    parser.add_argument("-ngpu", "--num_gpu", type=int, required=False, default=1, help="number of GPUs to be used")
-    parser.add_argument("-trsz", "--max_train_size", type=int, required=False, default=80000,
+    parser.add_argument("-bs", "--batch_size", type=str, required=False, default=10, help="Batch Size")
+    parser.add_argument("-lr", "--learning_rate", type=str, required=False, default=5e-4, help="Learning Rate")
+    parser.add_argument("-ngpu", "--num_gpu", type=str, required=False, default=1, help="number of GPUs to be used")
+    parser.add_argument("-trsz", "--max_train_size", type=str, required=False, default=80000,
                         help="Max number of questions to be considered in training set")
-    parser.add_argument("-vlsz", "--max_val_size", type=int, required=False, default=9000,
+    parser.add_argument("-vlsz", "--max_val_size", type=str, required=False, default=9000,
                         help="Max number of questions to be considered in validation set")
     parser.add_argument("-odir", "--outdir", type=str, required=True, default="baseline-qg-ce",
                         help="Directory where Training Outputs will be saved to")
