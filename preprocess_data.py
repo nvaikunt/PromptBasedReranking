@@ -13,9 +13,9 @@ def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz:
         disable_progress_bar()
     evidence_txt = create_evidence_texts(evidence_filepath)
     full_dataset = datasets.load_dataset("json", data_files=data_filepath, split="train")
-    full_dataset = full_dataset.map(partial(create_pos_txt_col, k=batch_sz,
+    full_dataset = full_dataset.map(partial(create_pos_txt_col, k=20,
                                             txt_database=evidence_txt), num_proc=4)
-    full_dataset = full_dataset.map(partial(create_pos_neg_txt_col, k=(batch_sz // 2),
+    full_dataset = full_dataset.map(partial(create_pos_neg_txt_col, k=(20 // 2),
                                             txt_database=evidence_txt), num_proc=4)
     if not isQG:
         train_creation_fct = create_ranking_loss_baseline_examples

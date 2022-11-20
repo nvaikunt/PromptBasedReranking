@@ -35,7 +35,10 @@ def train(args: argparse.Namespace):
     num_epochs = int(args.num_epochs)
     learning_rate = float(args.learning_rate)
     output_dir = args.outdir
-
+    if args.push == "True":
+        push = True
+    else: 
+        push = False	
     training_args = Seq2SeqTrainingArguments(
         output_dir=output_dir,
         evaluation_strategy="epoch",
@@ -43,11 +46,11 @@ def train(args: argparse.Namespace):
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         weight_decay=.05,
-        save_total_limit=3,
+        save_steps=10000,
         logging_strategy="epoch",
         num_train_epochs=num_epochs,
         hub_token=args.hub_token,
-        push_to_hub=True
+        push_to_hub=push
     )
 
     if not isRanking:
@@ -69,7 +72,8 @@ def train(args: argparse.Namespace):
             tokenizer=tokenizer
         )
     trainer.train()
-    trainer.push_to_hub(commit_message=f'{args.run_name}')
+    if push: 
+        trainer.push_to_hub(commit_message=f'{args.run_name}')
     if args.do_eval:
         trainer.evaluate()
 
@@ -110,6 +114,8 @@ if __name__ == "__main__":
     parser.add_argument("--run_name", type=str, required=True,
                         help="Run Name")
     parser.add_argument("--hub_token", type=str, required=False, default="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",
-                        help="Run Name")
+                        help="Token ID")
+    parser.add_argument("--push", type=str, required=False, default="True",
+                        help="To PUSH to HUB or NOT")
     arguments = parser.parse_args()
     main(arguments)
