@@ -34,6 +34,7 @@ def train(args: argparse.Namespace):
 
     num_epochs = int(args.num_epochs)
     learning_rate = float(args.learning_rate)
+    grad_accum_steps = int(args.grad_accumulation_steps)
     output_dir = args.outdir
     if args.push == "True":
         push = True
@@ -41,6 +42,7 @@ def train(args: argparse.Namespace):
         push = False	
     training_args = Seq2SeqTrainingArguments(
         output_dir=output_dir,
+        gradient_accumulation_steps=grad_accum_steps,
         evaluation_strategy="epoch",
         learning_rate=learning_rate,
         per_device_train_batch_size=batch_size,
@@ -116,6 +118,8 @@ if __name__ == "__main__":
     parser.add_argument("--hub_token", type=str, required=False, default="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",
                         help="Token ID")
     parser.add_argument("--push", type=str, required=False, default="True",
+                        help="To PUSH to HUB or NOT")
+    parser.add_argument("--grad_accumulation_steps", type=str, required=False, default="1",
                         help="To PUSH to HUB or NOT")
     arguments = parser.parse_args()
     main(arguments)
