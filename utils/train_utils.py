@@ -20,7 +20,7 @@ def create_ranking_loss_baseline_examples(dataset: datasets.Dataset, n: int = No
         if not texts:
             continue
         question = dataset[i]["question"]
-        current_inputs = [f"Question: {question} Passage: {text[0]} Relevant: " for text in texts]
+        current_inputs = [f"Query: {question} Document: {text[0]} Relevant: " for text in texts]
         current_targets = [text[1] for text in texts]
         inputs.extend(current_inputs)
         targets.extend(current_targets)
