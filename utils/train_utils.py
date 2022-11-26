@@ -68,38 +68,39 @@ def create_q_gen_ranking_baseline_examples(dataset: datasets.Dataset, n: int = N
     return {"inputs": inputs, "targets": targets, "k_pos_neg": k}
 
 
+def ranking_loss(logits, labels, margin=1, isQG=True, truth_ix=1176):
+
+    batch_size = labels.size(dim=0)
+
+    pos_end = batch_size // 2
+    ce_loss = torch.nn.CrossEntropyLoss()
+
+    pos_outputs = logits[:pos_end, :, :]
+    neg_outputs = logits[pos_end:, :, :]
+    flat_size = pos_outputs.size(-1)
+
+    if isQG:
+        pos_loss = ce_loss(pos_outputs.view(-1, flat_size), labels[:pos_end, :].view(-1))
+        neg_loss = ce_loss(neg_outputs.view(-1, flat_size), labels[pos_end:, :].view(-1))
+    else:
+        pos_outputs = pos_outputs[:, 0, :]
+        neg_outputs = neg_outputs[:, 0, :]
+        true_ids = torch.ones(pos_end) * truth_ix
+        pos_loss = ce_loss(pos_outputs.view(-1, flat_size), true_ids)
+        neg_loss = ce_loss(neg_outputs.view(-1, flat_size), true_ids)
+
+    margin_loss = torch.nn.MarginRankingLoss(margin)
+    loss = margin_loss(pos_loss, neg_loss, torch.tensor(-1))
+    return loss
+
+
 class CustomTrainer(Seq2SeqTrainer):
     def compute_loss(self, model, inputs, margin=1,
                      return_outputs=False, isQG=True, truth_ix=1176):
         labels = inputs.get("labels")
-        batch_size = labels.size(dim=0)
-
-        log_softmax = torch.nn.LogSoftmax(dim=-1)
-
         outputs = model(**inputs)
         logits = outputs.get("logits")
-        outputs = log_softmax(logits)
-
-        pos_end = batch_size // 2
-        ce_loss = torch.nn.CrossEntropyLoss()
-
-        pos_outputs = outputs[:pos_end, :, :]
-        neg_outputs = outputs[pos_end:, :, :]
-        flat_size = pos_outputs.size(-1)
-
-        if isQG:
-            pos_loss = ce_loss(pos_outputs.view(-1, flat_size), labels[:pos_end, :].view(-1))
-            neg_loss = ce_loss(neg_outputs.view(-1, flat_size), labels[pos_end:, :].view(-1))
-        else:
-            pos_outputs = pos_outputs[:, 0, :]
-            neg_outputs = neg_outputs[:, 0, :]
-            true_ids = torch.ones(pos_end) * truth_ix
-            pos_loss = ce_loss(pos_outputs.view(-1, flat_size), true_ids)
-            neg_loss = ce_loss(neg_outputs.view(-1, flat_size), true_ids)
-
-
-        margin_loss = torch.nn.MarginRankingLoss(margin)
-        loss = margin_loss(pos_loss, neg_loss, torch.tensor(-1))
+        loss = ranking_loss(logits, labels, margin, isQG, truth_ix)
         return (loss, outputs) if return_outputs else loss
 
     def get_train_dataloader(self) -> DataLoader:
