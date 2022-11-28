@@ -1,12 +1,14 @@
 import torch
-import tdqm
-from transformers import DataCollatorForSeq2Seq
+from tqdm import tqdm
+from transformers import DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditionalGeneration
 from torch.utils.data import DataLoader
 from functools import partial
-from utils.data_utils import qg_batching, relevance_batching, qg_ranking, relevance_ranking
+from utils.data_utils import qg_batching, relevance_batching, qg_ranking, relevance_ranking, preprocess_function
 import datasets
 from utils.train_utils import ranking_loss
 import numpy as np
+import argparse
+from preprocess_data import create_training_dataset
 
 
 def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
@@ -38,7 +40,7 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
 
         datasets.utils.disable_progress_bar()
         data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
-        eval_dataset = eval_dataset.map(partial(preprocess_function, max_input_length=300,
+        eval_dataset = eval_dataset.map(partial(preprocess_function, max_input_length=512,
                                                 max_target_length=50, input_col='inputs'),
                                         batched=True)
 
@@ -83,3 +85,67 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
     loss = sum(losses) / len(losses)
     return original_recall, current_recall, loss
 
+
+def print_eval_stats(filepath, run_name, dpr_recall, rerank_recall, loss):
+    with open(filepath, "w") as f:
+        f.write(f"Eval Loss for {run_name} is {loss}")
+        for i, (orig_recall, new_recall) in enumerate(zip(dpr_recall, rerank_recall)):
+            f.write(f"Recall@{i} for DPR: {orig_recall}")
+            f.write(f"Recall@{i} for {run_name}: {new_recall}")
+        f.write(f"Finish Stats for Run {run_name}")
+
+
+def main(args: argparse.Namespace):
+    model_ckpt, eval_data, outfile, evidence_dir = args.model_ckpt, \
+                                                     args.eval_data, args.outfile, args.evidence_dir
+    batch_sz = int(args.batch_size)
+    k = int(args.k)
+    max_eval_size = int(args.max_eval_size)
+
+    model = T5ForConditionalGeneration.from_pretrained(model_ckpt)
+    tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+
+    if args.isQG == "True":
+        isQG = True
+    else:
+        isQG = False
+    if args.isRanking == "True":
+        isRanking = True
+    else:
+        isRanking = False
+
+    validation_dataset, evidence_txt = create_training_dataset(eval_data, evidence_dir, max_eval_size,
+                                                               isQG, isRanking, batch_sz, tokenizer,
+                                                               args.dataset_verbose)
+
+    base_recall, exp_recall, eval_loss = evaluate_recall(validation_dataset, k, model, tokenizer,
+                                                         batch_sz, evidence_txt, preprocess_function, 1176,
+                                                         isRanking, isQG)
+    print_eval_stats(outfile, args.run_name, base_recall, exp_recall, eval_loss)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--isQG", type=str, required=False, default="True",
+                        help="Indicates whether model will be trained with Question Generation objective")
+    parser.add_argument("--isRanking", type=str, required=False, default="False",
+                        help="Indicates whether Ranking loss or Cross Entropy loss is being used")
+    parser.add_argument("--max_eval_size", type=str, required=False, default=9000,
+                        help="Max number of questions to be considered in validation set")
+    parser.add_argument( "--outfile", type=str, required=True, default="output.txt",
+                        help="Path to output file")
+    parser.add_argument("--evidence_dir", type=str, required=True,
+                        help="Path where Evidence Data is kept")
+    parser.add_argument("--eval_data", type=str, required=True,
+                        help="Path where Evaluation Dataset is Kept")
+    parser.add_argument("-m", "--model_ckpt", type=str, required=True,
+                        help="Checkpoint to start eval from")
+    parser.add_argument("--batch_size", type=str, required=False, default=10,
+                        help="Eval Batch Size")
+    parser.add_argument("--dataset_verbose", action='store_true',
+                        help="Print Progress Bars for Dataset Map function")
+    parser.add_argument("--run_name", type=str, required=True,
+                        help="Run Name")
+    parser.add_argument("--k", type=str, required=True, default=20, help="Number of Contexts to be considered")
+    arguments = parser.parse_args()
+    main(arguments)

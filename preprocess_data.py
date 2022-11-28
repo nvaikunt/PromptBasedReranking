@@ -8,7 +8,8 @@ from utils.train_utils import create_q_gen_baseline_examples, create_ranking_los
 
 
 def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz: int, isQG: bool, isRanking:bool,
-                            batch_sz: int, tokenizer: PreTrainedTokenizerBase, map_verbose: bool) -> datasets.Dataset:
+                            batch_sz: int, tokenizer: PreTrainedTokenizerBase,
+                            map_verbose: bool) -> tuple[datasets.Dataset, datasets.Dataset]:
     if not map_verbose:
         disable_progress_bar()
     evidence_txt = create_evidence_texts(evidence_filepath)
@@ -36,7 +37,7 @@ def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz:
                                               max_target_length=50, input_col='inputs'), batched=True)
     train_dataset = train_dataset.remove_columns(["inputs", "targets", "decoder_attention_mask", drop_col])
     train_dataset.set_format(type="torch")
-    return train_dataset
+    return train_dataset, evidence_txt
 
 
 
