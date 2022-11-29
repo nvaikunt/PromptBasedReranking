@@ -78,7 +78,7 @@ def qg_batching(question: str, ctxs: list,
     return eval_dataset
 
 
-def relevance_batching(question: str, ctxs: list, has_ans: list,
+def relevance_batching(question: str, ctxs: list, has_ans: torch.BoolTensor,
                        evidence_txts: datasets.Dataset) -> datasets.Dataset:
     texts = [evidence_txts[ctx["id"] - 1]["text"] for ctx in ctxs]
     texts = [f"Query: {question} Document: {text} Relevant: " for text in texts]

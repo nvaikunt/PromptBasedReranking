@@ -34,7 +34,7 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
 
         # Build Data as Model Expects
         if isQG:
-            eval_dataset = qg_batching(question, ctxs, has_ans, evidence_txts)
+            eval_dataset = qg_batching(question, ctxs, evidence_txts)
         else:
             eval_dataset = relevance_batching(question, ctxs, has_ans, evidence_txts)
 
