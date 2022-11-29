@@ -8,7 +8,7 @@ import datasets
 from utils.train_utils import ranking_loss
 import numpy as np
 import argparse
-from preprocess_data import create_training_dataset
+from preprocess_data import create_eval_dataset
 
 
 def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
@@ -114,9 +114,8 @@ def main(args: argparse.Namespace):
     else:
         isRanking = False
 
-    validation_dataset, evidence_txt = create_training_dataset(eval_data, evidence_dir, max_eval_size,
-                                                               isQG, isRanking, batch_sz, tokenizer,
-                                                               args.dataset_verbose)
+    validation_dataset, evidence_txt = create_eval_dataset(eval_data, evidence_dir, max_eval_size,
+                                                           args.dataset_verbose)
 
     base_recall, exp_recall, eval_loss = evaluate_recall(validation_dataset, k, model, tokenizer,
                                                          batch_sz, evidence_txt, preprocess_function, 1176,
