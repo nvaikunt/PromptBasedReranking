@@ -25,7 +25,6 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
     model.to(device)
     losses = []
     for i in tqdm(range(len(validation))):
-        print(i)
         # Extract Question, Passages, and Info on Whether Passages have Answer
         question = validation[i]["question"]
         ctxs = validation[i]["ctxs"][:k]
