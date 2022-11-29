@@ -9,7 +9,7 @@ from utils.train_utils import create_q_gen_baseline_examples, create_ranking_los
 
 def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz: int, isQG: bool, isRanking:bool,
                             batch_sz: int, tokenizer: PreTrainedTokenizerBase,
-                            map_verbose: bool) -> tuple[datasets.Dataset, datasets.Dataset]:
+                            map_verbose: bool):
     if not map_verbose:
         disable_progress_bar()
     evidence_txt = create_evidence_texts(evidence_filepath)
