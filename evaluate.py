@@ -13,8 +13,8 @@ from preprocess_data import create_eval_dataset
 
 def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
                     preprocess_function, truth_ix, isRanking=False, isQG=True):
-    assert k % batch_size != 0, "k must be multiple of batch_size"
-    assert batch_size % 2 != 0, "Batch Size Must Be Even"
+    assert k % batch_size == 0, "k must be multiple of batch_size"
+    assert batch_size % 2 == 0, "Batch Size Must Be Even"
 
     if k < batch_size:
         batch_size = k
