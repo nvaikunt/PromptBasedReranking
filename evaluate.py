@@ -13,8 +13,8 @@ from preprocess_data import create_eval_dataset
 
 def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
                     preprocess_function, truth_ix, isRanking=False, isQG=True):
-    assert k // batch_size != 0, "k must be multiple of batch_size"
-    assert batch_size // 2 != 0, "Batch Size Must Be Even"
+    assert k % batch_size != 0, "k must be multiple of batch_size"
+    assert batch_size % 2 != 0, "Batch Size Must Be Even"
 
     if k < batch_size:
         batch_size = k
@@ -91,9 +91,9 @@ def print_eval_stats(filepath, run_name, dpr_recall, rerank_recall, loss):
         f.write(f"Eval Loss for {run_name} is {loss}")
         f.write("\n")
         for i, (orig_recall, new_recall) in enumerate(zip(dpr_recall, rerank_recall)):
-            f.write(f"Recall@{i} for DPR: {orig_recall}")
+            f.write(f"Recall@{i + 1} for DPR: {orig_recall}")
             f.write("\n")
-            f.write(f"Recall@{i} for {run_name}: {new_recall}")
+            f.write(f"Recall@{i + 1} for {run_name}: {new_recall}")
             f.write("\n")
         f.write(f"Finish Stats for Run {run_name}")
         f.write("\n")
