@@ -40,7 +40,8 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
 
         datasets.utils.disable_progress_bar()
         data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
-        eval_dataset = eval_dataset.map(partial(preprocess_function, max_input_length=512,
+        eval_dataset = eval_dataset.map(partial(preprocess_function, tokenizer=tokenizer,
+                                                max_input_length=512,
                                                 max_target_length=50, input_col='inputs'),
                                         batched=True)
 
@@ -66,7 +67,7 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
                 if isQG:
                     score = qg_ranking(logits, labels)
                 else:
-                    score = relevance_ranking(logits, labels, truth_ix)
+                    score = relevance_ranking(logits, truth_ix)
                 scores.append(score)
 
         scores = torch.cat(scores)
