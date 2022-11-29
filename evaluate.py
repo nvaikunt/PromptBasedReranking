@@ -25,7 +25,7 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
     model.to(device)
     losses = []
     for i in tqdm(range(len(validation))):
-
+        print(i)
         # Extract Question, Passages, and Info on Whether Passages have Answer
         question = validation[i]["question"]
         ctxs = validation[i]["ctxs"][:k]
@@ -90,10 +90,14 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
 def print_eval_stats(filepath, run_name, dpr_recall, rerank_recall, loss):
     with open(filepath, "w") as f:
         f.write(f"Eval Loss for {run_name} is {loss}")
+        f.write("\n")
         for i, (orig_recall, new_recall) in enumerate(zip(dpr_recall, rerank_recall)):
             f.write(f"Recall@{i} for DPR: {orig_recall}")
+            f.write("\n")
             f.write(f"Recall@{i} for {run_name}: {new_recall}")
+            f.write("\n")
         f.write(f"Finish Stats for Run {run_name}")
+        f.write("\n")
 
 
 def main(args: argparse.Namespace):
