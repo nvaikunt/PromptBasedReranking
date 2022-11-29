@@ -8,13 +8,13 @@ import datasets
 from utils.train_utils import ranking_loss
 import numpy as np
 import argparse
-from preprocess_data import create_training_dataset
+from preprocess_data import create_eval_dataset
 
 
 def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
                     preprocess_function, truth_ix, isRanking=False, isQG=True):
-    assert k // batch_size != 0, "k must be multiple of batch_size"
-    assert batch_size // 2 != 0, "Batch Size Must Be Even"
+    assert k % batch_size != 0, "k must be multiple of batch_size"
+    assert batch_size % 2 != 0, "Batch Size Must Be Even"
 
     if k < batch_size:
         batch_size = k
@@ -25,7 +25,6 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
     model.to(device)
     losses = []
     for i in tqdm(range(len(validation))):
-
         # Extract Question, Passages, and Info on Whether Passages have Answer
         question = validation[i]["question"]
         ctxs = validation[i]["ctxs"][:k]
@@ -34,13 +33,14 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
 
         # Build Data as Model Expects
         if isQG:
-            eval_dataset = qg_batching(question, ctxs, has_ans, evidence_txts)
+            eval_dataset = qg_batching(question, ctxs, evidence_txts)
         else:
             eval_dataset = relevance_batching(question, ctxs, has_ans, evidence_txts)
 
         datasets.utils.disable_progress_bar()
         data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
-        eval_dataset = eval_dataset.map(partial(preprocess_function, max_input_length=512,
+        eval_dataset = eval_dataset.map(partial(preprocess_function, tokenizer=tokenizer,
+                                                max_input_length=512,
                                                 max_target_length=50, input_col='inputs'),
                                         batched=True)
 
@@ -66,7 +66,7 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
                 if isQG:
                     score = qg_ranking(logits, labels)
                 else:
-                    score = relevance_ranking(logits, labels, truth_ix)
+                    score = relevance_ranking(logits, truth_ix)
                 scores.append(score)
 
         scores = torch.cat(scores)
@@ -89,10 +89,14 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
 def print_eval_stats(filepath, run_name, dpr_recall, rerank_recall, loss):
     with open(filepath, "w") as f:
         f.write(f"Eval Loss for {run_name} is {loss}")
+        f.write("\n")
         for i, (orig_recall, new_recall) in enumerate(zip(dpr_recall, rerank_recall)):
-            f.write(f"Recall@{i} for DPR: {orig_recall}")
-            f.write(f"Recall@{i} for {run_name}: {new_recall}")
+            f.write(f"Recall@{i + 1} for DPR: {orig_recall}")
+            f.write("\n")
+            f.write(f"Recall@{i + 1} for {run_name}: {new_recall}")
+            f.write("\n")
         f.write(f"Finish Stats for Run {run_name}")
+        f.write("\n")
 
 
 def main(args: argparse.Namespace):
@@ -114,9 +118,8 @@ def main(args: argparse.Namespace):
     else:
         isRanking = False
 
-    validation_dataset, evidence_txt = create_training_dataset(eval_data, evidence_dir, max_eval_size,
-                                                               isQG, isRanking, batch_sz, tokenizer,
-                                                               args.dataset_verbose)
+    validation_dataset, evidence_txt = create_eval_dataset(eval_data, evidence_dir, max_eval_size,
+                                                           args.dataset_verbose)
 
     base_recall, exp_recall, eval_loss = evaluate_recall(validation_dataset, k, model, tokenizer,
                                                          batch_sz, evidence_txt, preprocess_function, 1176,

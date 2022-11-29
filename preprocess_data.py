@@ -9,7 +9,7 @@ from utils.train_utils import create_q_gen_baseline_examples, create_ranking_los
 
 def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz: int, isQG: bool, isRanking:bool,
                             batch_sz: int, tokenizer: PreTrainedTokenizerBase,
-                            map_verbose: bool) -> tuple[datasets.Dataset, datasets.Dataset]:
+                            map_verbose: bool):
     if not map_verbose:
         disable_progress_bar()
     evidence_txt = create_evidence_texts(evidence_filepath)
@@ -40,7 +40,16 @@ def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz:
     return train_dataset, evidence_txt
 
 
-
+def create_eval_dataset(data_filepath: str, evidence_filepath: str, data_sz: int,
+                            map_verbose: bool):
+    if not map_verbose:
+        disable_progress_bar()
+    evidence_txt = create_evidence_texts(evidence_filepath)
+    full_dataset = datasets.load_dataset("json", data_files=data_filepath, split="train")
+    if data_sz > len(full_dataset):
+        data_sz = len(full_dataset)
+    eval_dataset = full_dataset.select(range(data_sz))
+    return eval_dataset, evidence_txt
 
 
 
