@@ -10,8 +10,8 @@
 source /home/nvaikunt/miniconda3/etc/profile.d/conda.sh
 conda activate baseline
 cd /home/nvaikunt/PromptBasedReRanking
-export QG=False
-export RANKING=False
+export QG=True
+export RANKING=True
 export PER_EVAL_BATCH_SZ=25
 export EVAL_RUN='qg_rnk_eval_nq_test_chkpt1'
 export EVAL_DIR=/projects/tir5/users/nvaikunt/downloads/data/retriever-outputs/dpr/nq-test.json
