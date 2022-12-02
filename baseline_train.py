@@ -56,6 +56,7 @@ def train(args: argparse.Namespace):
         logging_strategy=args.strategy,
         logging_steps=1000,
         num_train_epochs=num_epochs,
+        save_strategy=args.strategy,
         save_total_limit=4,
         hub_token=args.hub_token,
         push_to_hub=push,

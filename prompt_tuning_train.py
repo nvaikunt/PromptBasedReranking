@@ -117,6 +117,7 @@ def prompt_train(args: argparse.Namespace):
         save_steps=5000,
         eval_steps=5000,
         logging_strategy=args.strategy,
+        save_strategy=args.strategy,
         logging_steps=1000,
         num_train_epochs=num_epochs,
         save_total_limit=4,
