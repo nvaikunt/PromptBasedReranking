@@ -108,7 +108,7 @@ def prompt_train(args: argparse.Namespace):
     training_args = Seq2SeqTrainingArguments(
         output_dir=output_dir,
         gradient_accumulation_steps=grad_accum_steps,
-        evaluation_strategy="steps",
+        evaluation_strategy=args.strategy,
         learning_rate=learning_rate,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
@@ -116,7 +116,7 @@ def prompt_train(args: argparse.Namespace):
         warmup_steps=warm_up_steps,
         save_steps=5000,
         eval_steps=5000,
-        logging_strategy="steps",
+        logging_strategy=args.strategy,
         logging_steps=1000,
         num_train_epochs=num_epochs,
         save_total_limit=4,

@@ -136,6 +136,8 @@ def parse_train_args(parser):
                         help="Number of intital steps before hitting max lr")
     parser.add_argument("--weight_decay", type=str, required=False, default="5e-5",
                         help="Decoupled Weight Regularizer")
+    parser.add_argument("--strategy", type=str, required=False, default="steps",
+                        help="Logging and Saving Strategy")
     return parser
 
 class CustomTrainer(Seq2SeqTrainer):
