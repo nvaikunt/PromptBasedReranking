@@ -16,4 +16,4 @@ export N_EPOCHS=1
 export RANKING=FALSE
 export QG=FALSE
 export OUTPUT_DIR=/projects/tir5/users/nvaikunt/rel_nornk_exp/prompt_model
-bash run_prompt_tuning.sh
+bash shell_scripts/run_prompt_tuning.sh

@@ -16,4 +16,4 @@ export LR=7e-4
 export N_EPOCHS=1
 export PER_GPU_BATCH_SZ=16
 export OUTPUT_DIR=/projects/tir5/users/nvaikunt/qgen_nornk_exp/prompt_model
-bash run_prompt_tuning.sh
+bash shell_scripts/run_prompt_tuning.sh

@@ -16,4 +16,4 @@ export N_EPOCHS=3
 export RANKING=FALSE
 export QG=FALSE
 export OUTPUT_DIR=/projects/tir5/users/nvaikunt/rel_nornk_exp/model2
-bash run_baseline.sh
+bash shell_scripts/run_baseline.sh
