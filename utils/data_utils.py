@@ -56,35 +56,54 @@ def create_pos_neg_txt_col(example, k: int, txt_database: datasets.Dataset) -> d
 
 
 def preprocess_function(examples, tokenizer,
-                        max_input_length: int, max_target_length: int, input_col: str) -> dict:
+                        max_input_length: int, max_target_length: int) -> dict:
     model_inputs = tokenizer(
-        examples[input_col],
+        examples["inputs"],
         max_length=max_input_length,
         truncation=True,
-        padding="longest")
+        padding="max_length",
+        return_tensors="pt")
     labels = tokenizer(text_target=examples["targets"], max_length=max_target_length, truncation=True,
-                       padding="longest", return_tensors="pt")
+                       padding="max_length", return_tensors="pt")
     model_inputs["labels"] = labels["input_ids"]
     model_inputs["decoder_attention_mask"] = labels["attention_mask"]
     return model_inputs
 
 
+def preprocess_func_soft_prompt(examples, tokenizer, n_tokens: int, max_input_length: int,
+                                max_target_length: int) -> dict:
+    model_inputs = preprocess_function(examples, tokenizer, max_input_length, max_target_length)
+    model_inputs["input_ids"] = torch.cat([model_inputs["input_ids"],
+                                           torch.full((model_inputs["input_ids"].size(0), n_tokens), 5)], 1)
+    model_inputs["attention_mask"] = torch.cat([model_inputs["attention_mask"],
+                                                torch.full((model_inputs["attention_mask"].size(0), n_tokens), 1)], 1)
+    model_inputs["labels"] = torch.cat([model_inputs["labels"],
+                                        torch.full((model_inputs["labels"].size(0), n_tokens), -100)], 1)
+    model_inputs["decoder_attention_mask"] = torch.cat([model_inputs["decoder_attention_mask"],
+                                                        torch.full((model_inputs["decoder_attention_mask"].size(0),
+                                                                    n_tokens), 0)], 1)
+    return model_inputs
+
+
 def qg_batching(question: str, ctxs: list,
-                evidence_txts: datasets.Dataset) -> datasets.Dataset:
+                evidence_txts: datasets.Dataset, is_prompt=False) -> datasets.Dataset:
     texts = [evidence_txts[ctx["id"] - 1]["text"] for ctx in ctxs]
-    texts = [f"Passage: {text} Please write a question based on this passage" for text in texts]
+    if is_prompt:
+        texts = [f"Passage: {text}" for text in texts]
+    else:
+        texts = [f"Passage: {text} Please write a question based on this passage" for text in texts]
     targets = [question for text in texts]
     eval_dataset = datasets.Dataset.from_dict({'inputs': texts, 'targets': targets})
     return eval_dataset
 
 
 def relevance_batching(question: str, ctxs: list, has_ans: torch.BoolTensor,
-                       evidence_txts: datasets.Dataset) -> datasets.Dataset:
+                       evidence_txts: datasets.Dataset, is_prompt=False) -> datasets.Dataset:
     texts = [evidence_txts[ctx["id"] - 1]["text"] for ctx in ctxs]
-    # Below is real baseline, but commenting for now to minimize current train / test imbalance
-    # texts = [f"Query: {question} Document: {text} Relevant: " for text in texts]
-    # Below is the temp current line to match incorrect training
-    texts = [f"Question: {question} Passage: {text} Relevant: " for text in texts]
+    if is_prompt:
+        texts = [f"Query: {question} Document: {text}" for text in texts]
+    else:
+        texts = [f"Query: {question} Document: {text} Relevant: " for text in texts]
     targets = ["true" if ans else "false" for ans in has_ans]
     new_dataset = datasets.Dataset.from_dict({'inputs': texts, 'targets': targets})
     return new_dataset

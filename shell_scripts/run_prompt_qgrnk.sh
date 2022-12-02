@@ -1,6 +1,6 @@
 #!/bin/sh
 #SBATCH --job-name=trn_qg_rnk_baseline
-#SBATCH --output /projects/tir5/users/nvaikunt/qgen_rnk_exp_true/log/output.txt
+#SBATCH --output /projects/tir5/users/nvaikunt/qgen_rnk_exp/prompt_log/output.txt
 #SBATCH --mem=32G
 #SBATCH --time=48:00:00
 #SBATCH --ntasks=1
@@ -13,5 +13,5 @@ cd /home/nvaikunt/PromptBasedReRanking
 export QG=True
 export RANKING=True
 export PER_GPU_BATCH_SZ=32
-export OUTPUT_DIR=/projects/tir5/users/nvaikunt/qgen_rnk_exp_true/model
+export OUTPUT_DIR=/projects/tir5/users/nvaikunt/qgen_rnk_exp/prompt_model
 bash run_baseline.sh

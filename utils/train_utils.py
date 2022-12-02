@@ -95,6 +95,49 @@ def ranking_loss(logits, labels, margin=1, isQG=True, truth_ix=1176):
     return loss
 
 
+def parse_train_args(parser):
+
+    parser.add_argument("--isQG", type=str, required=False, default="True",
+                        help="Indicates whether model will be trained with Question Generation objective")
+    parser.add_argument("--isRanking", type=str, required=False, default="False",
+                        help="Indicates whether Ranking loss or Cross Entropy loss is being used")
+    parser.add_argument("-ep", "--num_epochs", type=str, required=True, default=3,
+                        help="Number of Epochs to Train for")
+    parser.add_argument("-bs", "--batch_size", type=str, required=False, default=10, help="Batch Size")
+    parser.add_argument("-lr", "--learning_rate", type=str, required=False, default=5e-4, help="Learning Rate")
+    parser.add_argument("-trsz", "--max_train_size", type=str, required=False, default=80000,
+                        help="Max number of questions to be considered in training set")
+    parser.add_argument("-vlsz", "--max_val_size", type=str, required=False, default=9000,
+                        help="Max number of questions to be considered in validation set")
+    parser.add_argument("-odir", "--outdir", type=str, required=True, default="baseline-qg-ce",
+                        help="Directory where Training Outputs will be saved to")
+    parser.add_argument("-edir", "--evidence_dir", type=str, required=True,
+                        help="Directory where Evidence Data will be saved to")
+    parser.add_argument("-tdir", "--train_dir", type=str, required=True,
+                        help="Directory where Train Data will be saved to")
+    parser.add_argument("-vdir", "--val_dir", type=str, required=True,
+                        help="Directory where Validation Data will be saved to")
+    parser.add_argument("-m", "--model_ckpt", type=str, required=False, default="google/t5-base-lm-adapt",
+                        help="Checkpoint to start training from")
+    parser.add_argument("--do_eval", action='store_true',
+                        help="Evaluated at the end of training")
+    parser.add_argument("--dataset_verbose", action='store_true',
+                        help="Print Progress Bars for Dataset Map function")
+    parser.add_argument("--run_name", type=str, required=True,
+                        help="Run Name")
+    parser.add_argument("--hub_token", type=str, required=False, default="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",
+                        help="Token ID")
+    parser.add_argument("--push", type=str, required=False, default="True",
+                        help="To PUSH to HUB or NOT")
+    parser.add_argument("--grad_accumulation_steps", type=str, required=True, default="1",
+                        help="Number of Iterations to Perform Before Update, Effective Batch_sz is "
+                             "Batch SZ * Grad Step")
+    parser.add_argument("--warmup_steps", type=str, required=True, default="1000",
+                        help="Number of intital steps before hitting max lr")
+    parser.add_argument("--weight_decay", type=str, required=True, default="5e-5",
+                        help="Decoupled Weight Regularizer")
+    return parser
+
 class CustomTrainer(Seq2SeqTrainer):
     def compute_loss(self, model, inputs, margin=1,
                      return_outputs=False, isQG=True, truth_ix=1176):
@@ -199,3 +242,4 @@ class CustomTrainer(Seq2SeqTrainer):
             num_workers=self.args.dataloader_num_workers,
             pin_memory=self.args.dataloader_pin_memory,
         )
+
