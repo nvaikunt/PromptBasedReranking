@@ -12,6 +12,8 @@ conda activate baseline
 cd /home/nvaikunt/PromptBasedReRanking
 export QG=True
 export RANKING=False
-export PER_GPU_BATCH_SZ=32
+export PER_GPU_BATCH_SZ=16
+export LR=2e-5
+export N_EPOCHS=3
 export OUTPUT_DIR=/projects/tir5/users/nvaikunt/qgen_nornk_exp/model2
 bash run_baseline.sh

@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --job-name=trn_qg_rnk_baseline
+#SBATCH --job-name=trn_qgrnk_prompt
 #SBATCH --output /projects/tir5/users/nvaikunt/qgen_rnk_exp/prompt_log/output.txt
 #SBATCH --mem=32G
 #SBATCH --time=48:00:00
@@ -12,6 +12,8 @@ conda activate baseline
 cd /home/nvaikunt/PromptBasedReRanking
 export QG=True
 export RANKING=True
-export PER_GPU_BATCH_SZ=32
+export LR=7e-4
+export N_EPOCHS=1
+export PER_GPU_BATCH_SZ=16
 export OUTPUT_DIR=/projects/tir5/users/nvaikunt/qgen_rnk_exp/prompt_model
 bash run_baseline.sh
