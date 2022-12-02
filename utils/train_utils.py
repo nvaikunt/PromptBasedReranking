@@ -132,9 +132,9 @@ def parse_train_args(parser):
     parser.add_argument("--grad_accumulation_steps", type=str, required=True, default="1",
                         help="Number of Iterations to Perform Before Update, Effective Batch_sz is "
                              "Batch SZ * Grad Step")
-    parser.add_argument("--warmup_steps", type=str, required=True, default="1000",
+    parser.add_argument("--warmup_steps", type=str, required=False, default="1000",
                         help="Number of intital steps before hitting max lr")
-    parser.add_argument("--weight_decay", type=str, required=True, default="5e-5",
+    parser.add_argument("--weight_decay", type=str, required=False, default="5e-5",
                         help="Decoupled Weight Regularizer")
     return parser
 
