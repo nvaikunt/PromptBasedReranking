@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-from transformers import T5Config,DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditionalGeneration, AutoModelForSeq2SeqLM
+from transformers import DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditionalGeneration
 from torch.utils.data import DataLoader
 from functools import partial
 from utils.data_utils import qg_batching, relevance_batching, qg_ranking, relevance_ranking, \
@@ -121,11 +121,14 @@ def main(args: argparse.Namespace):
     else:
         is_prompt = False
     if args.is_prompt:
-        model_pt_file = os.path.join(model_ckpt, "pytorch_model.bin")
-        model = torch.load(model_pt_file)
-        # model.eval()
-        print(model)
-        tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+        model = T5ForConditionalGeneration("google/t5-base-lm-adapt")
+        tokenizer = AutoTokenizer.from_pretrained("google/t5-base-lm-adapt")
+        path_to_prompt = os.path.join(model_ckpt, f"{args.prompt_run_name}_prompt.pt")
+        saved_embed = torch.load(path_to_prompt)
+        soft_embed = SoftEmbedding(model.get_input_embeddings(), n_tokens,
+                                   initialize_from_vocab=True)
+        soft_embed.set_pretrained_embedding(saved_embed.learned_embedding)
+        model.set_input_embeddings(soft_embed)
     else:
         model = T5ForConditionalGeneration.from_pretrained(model_ckpt)
         tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
@@ -138,7 +141,6 @@ def main(args: argparse.Namespace):
         isRanking = True
     else:
         isRanking = False
-
 
     validation_dataset, evidence_txt = create_eval_dataset(eval_data, evidence_dir, max_eval_size,
                                                            args.dataset_verbose)
@@ -175,6 +177,8 @@ if __name__ == "__main__":
                         help="Print Progress Bars for Dataset Map function")
     parser.add_argument("--run_name", type=str, required=True,
                         help="Run Name")
+    parser.add_argument("--prompt_run_name", type=str, required=False,
+                        help="Run Name of Prompt Model")
     parser.add_argument("--k", type=str, required=True, default=20, help="Number of Contexts to be considered")
     arguments = parser.parse_args()
     main(arguments)

@@ -4,6 +4,7 @@ from transformers import AutoTokenizer, T5ForConditionalGeneration, DataCollator
     Seq2SeqTrainer, Seq2SeqTrainingArguments
 import torch
 import torch.nn as nn
+import os
 from utils.train_utils import CustomTrainer, parse_train_args
 _truth_ix = 1176
 
@@ -43,6 +44,10 @@ class SoftEmbedding(nn.Module):
         if initialize_from_vocab:
             return self.wte.weight[:n_tokens].clone().detach()
         return torch.FloatTensor(n_tokens, wte.weight.size(1)).uniform_(-random_range, random_range)
+
+    def set_pretrained_embedding(self, trained_embedding: nn.Module):
+        print("Setting Embedding Using Weights From Pretrained Runs")
+        self.learned_embedding = trained_embedding
 
     def forward(self, tokens):
         """run forward pass
@@ -145,6 +150,10 @@ def prompt_train(args: argparse.Namespace):
             tokenizer=tokenizer
         )
     trainer.train()
+    prompt_store_file = f'{args.run_name}_prompt.pt'
+    prompt_store_pth = os.path.join(output_dir, prompt_store_file)
+    prompt_embeds = model.get_input_embeddings()
+    torch.save(prompt_embeds, prompt_store_pth)
     if push:
         trainer.push_to_hub(commit_message=f'{args.run_name}')
     if args.do_eval:

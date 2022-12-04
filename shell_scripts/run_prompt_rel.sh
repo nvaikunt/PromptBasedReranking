@@ -12,7 +12,8 @@ conda activate baseline
 cd /home/nvaikunt/PromptBasedReRanking
 export PER_GPU_BATCH_SZ=16
 export LR=1e-3
-export N_EPOCHS=1
+export N_EPOCHS=2
+export RUN_NAME="rel_prompt"
 export RANKING=FALSE
 export QG=FALSE
 export OUTPUT_DIR=/projects/tir5/users/nvaikunt/rel_nornk_exp/prompt_model

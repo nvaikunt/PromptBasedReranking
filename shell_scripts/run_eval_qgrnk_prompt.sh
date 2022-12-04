@@ -13,6 +13,7 @@ cd /home/nvaikunt/PromptBasedReRanking
 export QG=True
 export RANKING=True
 export IS_PROMPT=True
+export PROMPT_RUN="qgrnk_prompt"
 export PER_EVAL_BATCH_SZ=10
 export EVAL_RUN='qgen_rnk_eval_nq_test'
 export EVAL_DIR=/projects/tir5/users/nvaikunt/downloads/data/retriever-outputs/dpr/nq-test.json
