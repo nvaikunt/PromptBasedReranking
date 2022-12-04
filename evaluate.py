@@ -123,7 +123,7 @@ def main(args: argparse.Namespace):
     if args.is_prompt:
         model_pt_file = os.path.join(model_ckpt, "pytorch_model.bin")
         model = torch.load(model_pt_file)
-        model.eval()
+        # model.eval()
         print(model)
         tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     else:
