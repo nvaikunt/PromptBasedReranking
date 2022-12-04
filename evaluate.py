@@ -121,7 +121,7 @@ def main(args: argparse.Namespace):
         is_prompt = False
     if args.is_prompt:
         init_config = T5Config.from_pretrained(model_ckpt)
-        model = AutoModelForSeq2SeqLM(init_config)
+        model = AutoModelForSeq2SeqLM.from_config(init_config)
         soft_embed = SoftEmbedding(model.get_input_embeddings(), n_tokens,
                                    initialize_from_vocab=True)
         model.set_input_embeddings(soft_embed)
