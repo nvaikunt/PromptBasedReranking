@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-from transformers import T5Config,DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditionalGeneration
+from transformers import T5Config,DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditionalGeneration, AutoModelForSeq2SeqLM
 from torch.utils.data import DataLoader
 from functools import partial
 from utils.data_utils import qg_batching, relevance_batching, qg_ranking, relevance_ranking, \
@@ -121,7 +121,7 @@ def main(args: argparse.Namespace):
         is_prompt = False
     if args.is_prompt:
         init_config = T5Config.from_pretrained(model_ckpt)
-        model = T5ForConditionalGeneration(init_config)
+        model = AutoModelForSeq2SeqLM(init_config)
         soft_embed = SoftEmbedding(model.get_input_embeddings(), n_tokens,
                                    initialize_from_vocab=True)
         model.set_input_embeddings(soft_embed)
