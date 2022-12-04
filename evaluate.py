@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-from transformers import DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditionalGeneration
+from transformers import T5Config,DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditionalGeneration
 from torch.utils.data import DataLoader
 from functools import partial
 from utils.data_utils import qg_batching, relevance_batching, qg_ranking, relevance_ranking, \
@@ -10,6 +10,7 @@ from utils.train_utils import ranking_loss
 import numpy as np
 import argparse
 from preprocess_data import create_eval_dataset
+from prompt_tuning_train import SoftEmbedding
 
 
 def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
@@ -112,9 +113,22 @@ def main(args: argparse.Namespace):
     batch_sz = int(args.batch_size)
     k = int(args.k)
     max_eval_size = int(args.max_eval_size)
+    n_tokens = int(args.n_tokens)
+    if args.is_prompt == "True":
+        is_prompt = True
 
-    model = T5ForConditionalGeneration.from_pretrained(model_ckpt)
-    tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+    else:
+        is_prompt = False
+    if args.is_prompt:
+        init_config = T5Config()
+        model = T5ForConditionalGeneration(init_config)
+        soft_embed = SoftEmbedding(model.get_input_embeddings(), n_tokens,
+                                   initialize_from_vocab=True)
+        model.set_input_embeddings(soft_embed)
+        model = model.from_pretrained(model_ckpt)
+    else:
+        model = T5ForConditionalGeneration.from_pretrained(model_ckpt)
+        tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
 
     if args.isQG == "True":
         isQG = True
@@ -124,13 +138,9 @@ def main(args: argparse.Namespace):
         isRanking = True
     else:
         isRanking = False
-    if args.is_prompt == "True":
-        is_prompt = True
 
-    else:
-        is_prompt = False
 
-    n_tokens = int(args.n_tokens)
+
     validation_dataset, evidence_txt = create_eval_dataset(eval_data, evidence_dir, max_eval_size,
                                                            args.dataset_verbose)
 
