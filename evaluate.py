@@ -3,7 +3,8 @@ from tqdm import tqdm
 from transformers import DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditionalGeneration
 from torch.utils.data import DataLoader
 from functools import partial
-from utils.data_utils import qg_batching, relevance_batching, qg_ranking, relevance_ranking, preprocess_function
+from utils.data_utils import qg_batching, relevance_batching, qg_ranking, relevance_ranking, \
+    preprocess_function, preprocess_func_soft_prompt
 import datasets
 from utils.train_utils import ranking_loss
 import numpy as np
@@ -12,7 +13,7 @@ from preprocess_data import create_eval_dataset
 
 
 def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
-                    preprocess_function, truth_ix, isRanking=False, isQG=True):
+                    is_prompt, truth_ix, n_tokens, isRanking=False, isQG=True):
     assert k % batch_size == 0, "k must be multiple of batch_size"
     assert batch_size % 2 == 0, "Batch Size Must Be Even"
 
@@ -39,9 +40,15 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
 
         datasets.utils.disable_progress_bar()
         data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
-        eval_dataset = eval_dataset.map(partial(preprocess_function, tokenizer=tokenizer,
-                                                max_input_length=512,
-                                                max_target_length=50, input_col='inputs'),
+        if is_prompt:
+            eval_dataset = eval_dataset.map(partial(preprocess_func_soft_prompt, tokenizer=tokenizer,
+                                            max_input_length=412, n_tokens=n_tokens,
+                                            max_target_length=50, input_col='inputs'),
+                                        batched=True)
+        else:
+            eval_dataset = eval_dataset.map(partial(preprocess_function, tokenizer=tokenizer,
+                                            max_input_length=512,
+                                             max_target_length=50, input_col='inputs'),
                                         batched=True)
 
         eval_dataset = eval_dataset.remove_columns(["inputs", "targets"])
@@ -117,13 +124,19 @@ def main(args: argparse.Namespace):
         isRanking = True
     else:
         isRanking = False
+    if args.is_prompt == "True":
+        is_prompt = True
 
+    else:
+        is_prompt = False
+
+    n_tokens = int(args.n_tokens)
     validation_dataset, evidence_txt = create_eval_dataset(eval_data, evidence_dir, max_eval_size,
                                                            args.dataset_verbose)
 
     base_recall, exp_recall, eval_loss = evaluate_recall(validation_dataset, k, model, tokenizer,
-                                                         batch_sz, evidence_txt, preprocess_function, 1176,
-                                                         isRanking, isQG)
+                                                         batch_sz, evidence_txt, is_prompt, 1176,
+                                                         n_tokens, isRanking, isQG)
     print_eval_stats(outfile, args.run_name, base_recall, exp_recall, eval_loss)
 
 
@@ -145,6 +158,10 @@ if __name__ == "__main__":
                         help="Checkpoint to start eval from")
     parser.add_argument("--batch_size", type=str, required=False, default=10,
                         help="Eval Batch Size")
+    parser.add_argument("--is_prompt", type=str, required=True, default="False",
+                        help="Model is Prompt Tuning Model")
+    parser.add_argument("--n_tokens", type=str, required=False, default="100",
+                        help="Number of Prompt Tokens, only needed if prompt")
     parser.add_argument("--dataset_verbose", action='store_true',
                         help="Print Progress Bars for Dataset Map function")
     parser.add_argument("--run_name", type=str, required=True,
