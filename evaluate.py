@@ -9,6 +9,7 @@ import datasets
 from utils.train_utils import ranking_loss
 import numpy as np
 import argparse
+import os
 from preprocess_data import create_eval_dataset
 from prompt_tuning_train import SoftEmbedding
 
@@ -120,12 +121,10 @@ def main(args: argparse.Namespace):
     else:
         is_prompt = False
     if args.is_prompt:
-        init_config = T5Config.from_pretrained(model_ckpt)
-        model = AutoModelForSeq2SeqLM.from_config(init_config)
-        soft_embed = SoftEmbedding(model.get_input_embeddings(), n_tokens,
-                                   initialize_from_vocab=True)
-        model.set_input_embeddings(soft_embed)
-        model = model.from_pretrained(model_ckpt)
+        model_pt_file = os.path.join(model_ckpt, "pytorch_model.bin")
+        model = torch.load(model_pt_file)
+        model.eval()
+        print(model)
         tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     else:
         model = T5ForConditionalGeneration.from_pretrained(model_ckpt)
