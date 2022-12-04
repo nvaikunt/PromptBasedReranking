@@ -120,12 +120,13 @@ def main(args: argparse.Namespace):
     else:
         is_prompt = False
     if args.is_prompt:
-        init_config = T5Config()
+        init_config = T5Config.from_pretrained(model_ckpt)
         model = T5ForConditionalGeneration(init_config)
         soft_embed = SoftEmbedding(model.get_input_embeddings(), n_tokens,
                                    initialize_from_vocab=True)
         model.set_input_embeddings(soft_embed)
         model = model.from_pretrained(model_ckpt)
+        tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
     else:
         model = T5ForConditionalGeneration.from_pretrained(model_ckpt)
         tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
@@ -138,7 +139,6 @@ def main(args: argparse.Namespace):
         isRanking = True
     else:
         isRanking = False
-
 
 
     validation_dataset, evidence_txt = create_eval_dataset(eval_data, evidence_dir, max_eval_size,
