@@ -17,7 +17,7 @@ export PER_EVAL_BATCH_SZ=10
 export EVAL_RUN='rel_nornk_eval_nq_test'
 export EVAL_DIR=/projects/tir5/users/nvaikunt/downloads/data/retriever-outputs/dpr/nq-test.json
 export OUTFILE=/projects/tir5/users/nvaikunt/rel_nornk_exp/prompt_log/eval_metrics_baseline_nq_test.txt
-export MODEL=/projects/tir5/users/nvaikunt/rel_nornk_exp/model/checkpoint-20000
+export MODEL=/projects/tir5/users/nvaikunt/rel_nornk_exp/prompt_model/checkpoint-20000
 bash shell_scripts/run_eval.sh
 export EVAL_RUN='rel_nornk_eval_squad1_test'
 export EVAL_DIR=/projects/tir5/users/nvaikunt/downloads/data/retriever-outputs/dpr/squad1-test.json

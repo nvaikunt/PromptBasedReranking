@@ -43,12 +43,12 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
         if is_prompt:
             eval_dataset = eval_dataset.map(partial(preprocess_func_soft_prompt, tokenizer=tokenizer,
                                             max_input_length=412, n_tokens=n_tokens,
-                                            max_target_length=50, input_col='inputs'),
+                                            max_target_length=50),
                                         batched=True)
         else:
             eval_dataset = eval_dataset.map(partial(preprocess_function, tokenizer=tokenizer,
                                             max_input_length=512,
-                                             max_target_length=50, input_col='inputs'),
+                                             max_target_length=50),
                                         batched=True)
 
         eval_dataset = eval_dataset.remove_columns(["inputs", "targets"])
