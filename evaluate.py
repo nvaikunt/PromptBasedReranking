@@ -117,11 +117,10 @@ def main(args: argparse.Namespace):
     n_tokens = int(args.n_tokens)
     if args.is_prompt == "True":
         is_prompt = True
-
     else:
         is_prompt = False
     if args.is_prompt:
-        model = T5ForConditionalGeneration("google/t5-base-lm-adapt")
+        model = T5ForConditionalGeneration.from_pretrained("google/t5-base-lm-adapt")
         tokenizer = AutoTokenizer.from_pretrained("google/t5-base-lm-adapt")
         path_to_prompt = os.path.join(model_ckpt, f"{args.prompt_run_name}_prompt.pt")
         saved_embed = torch.load(path_to_prompt)
