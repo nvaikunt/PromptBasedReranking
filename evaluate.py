@@ -119,7 +119,7 @@ def main(args: argparse.Namespace):
         is_prompt = True
     else:
         is_prompt = False
-    if args.is_prompt:
+    if is_prompt:
         model = T5ForConditionalGeneration.from_pretrained("google/t5-base-lm-adapt")
         tokenizer = AutoTokenizer.from_pretrained("google/t5-base-lm-adapt")
         path_to_prompt = os.path.join(model_ckpt, f"{args.prompt_run_name}_prompt.pt")
