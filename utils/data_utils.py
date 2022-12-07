@@ -84,6 +84,20 @@ def preprocess_func_soft_prompt(examples, tokenizer, n_tokens: int, max_input_le
                                                                     n_tokens), 0)], 1)
     return model_inputs
 
+def preprocess_func_soft_prompt_eval(examples, tokenizer, n_tokens: int, max_input_length: int,
+                                max_target_length: int) -> dict:
+    model_inputs = preprocess_function(examples, tokenizer, max_input_length, max_target_length)
+    model_inputs["input_ids"] = torch.cat([model_inputs["input_ids"],
+                                           torch.full((model_inputs["input_ids"].size(0), n_tokens), 5)], 1)
+    model_inputs["attention_mask"] = torch.cat([model_inputs["attention_mask"],
+                                                torch.full((model_inputs["attention_mask"].size(0), n_tokens), 1)], 1)
+    model_inputs["labels"] = torch.cat([model_inputs["labels"],
+                                        torch.full((model_inputs["labels"].size(0), n_tokens), 0)], 1)
+    model_inputs["decoder_attention_mask"] = torch.cat([model_inputs["decoder_attention_mask"],
+                                                        torch.full((model_inputs["decoder_attention_mask"].size(0),
+                                                                    n_tokens), 0)], 1)
+    return model_inputs
+
 
 def qg_batching(question: str, ctxs: list,
                 evidence_txts: datasets.Dataset, is_prompt=False) -> datasets.Dataset:

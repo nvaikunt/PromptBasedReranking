@@ -4,7 +4,7 @@ from transformers import DataCollatorForSeq2Seq, AutoTokenizer, T5ForConditional
 from torch.utils.data import DataLoader
 from functools import partial
 from utils.data_utils import qg_batching, relevance_batching, qg_ranking, relevance_ranking, \
-    preprocess_function, preprocess_func_soft_prompt
+    preprocess_function, preprocess_func_soft_prompt_eval
 import datasets
 from utils.train_utils import ranking_loss
 import numpy as np
@@ -43,7 +43,7 @@ def evaluate_recall(validation, k, model, tokenizer, batch_size, evidence_txts,
         datasets.utils.disable_progress_bar()
         data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
         if is_prompt:
-            eval_dataset = eval_dataset.map(partial(preprocess_func_soft_prompt, tokenizer=tokenizer,
+            eval_dataset = eval_dataset.map(partial(preprocess_func_soft_prompt_eval, tokenizer=tokenizer,
                                             max_input_length=412, n_tokens=n_tokens,
                                             max_target_length=50),
                                         batched=True)
