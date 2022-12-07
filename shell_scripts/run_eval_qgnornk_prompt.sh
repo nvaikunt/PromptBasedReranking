@@ -12,7 +12,7 @@ conda activate baseline
 cd /home/nvaikunt/PromptBasedReRanking
 export QG=True
 export RANKING=False
-export PER_EVAL_BATCH_SZ=10
+export PER_EVAL_BATCH_SZ=8
 export PROMPT_RUN="qgnornk_prompt"
 export IS_PROMPT=True
 export EVAL_RUN='qgen_nornk_eval_nq_test'
