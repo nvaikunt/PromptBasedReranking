@@ -2,7 +2,7 @@
 #SBATCH --job-name=trn_rel_nornk_prompt
 #SBATCH --output /projects/tir5/users/nvaikunt/rel_nornk_exp/prompt_log/output.txt
 #SBATCH --mem=32G
-#SBATCH --time=24:00:00
+#SBATCH --time=48:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:A6000:2
