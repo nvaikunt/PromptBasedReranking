@@ -2,7 +2,7 @@
 #SBATCH --job-name=trn_qg_rnk_baseline_eval
 #SBATCH --output /projects/tir5/users/nvaikunt/qgen_nornk_exp/prompt_log/output_eval.txt
 #SBATCH --mem=32G
-#SBATCH --time=16:00:00
+#SBATCH --time=30:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:2
@@ -18,7 +18,7 @@ export IS_PROMPT=True
 export EVAL_RUN='qgen_nornk_eval_nq_test'
 export EVAL_DIR=/projects/tir5/users/nvaikunt/downloads/data/retriever-outputs/dpr/nq-test.json
 export OUTFILE=/projects/tir5/users/nvaikunt/qgen_nornk_exp/prompt_log/eval_metrics_baseline_nq_test.txt
-export MODEL=/projects/tir5/users/nvaikunt/qgen_nornk_exp/prompt_model/checkpoint-20000
+export MODEL=/projects/tir5/users/nvaikunt/qgen_nornk_exp/prompt_model/checkpoint-15000
 bash shell_scripts/run_eval.sh
 export EVAL_RUN='qgen_nornk_eval_squad1_test'
 export EVAL_DIR=/projects/tir5/users/nvaikunt/downloads/data/retriever-outputs/dpr/squad1-test.json
