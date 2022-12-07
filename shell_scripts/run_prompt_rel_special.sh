@@ -14,6 +14,7 @@ export PER_GPU_BATCH_SZ=10
 export MODEL=16
 export LR=1e-3
 export N_EPOCHS=2
+export N_TOKENS=100
 export TRAIN_EX=10
 export VAL_SZ=10
 export RUN_NAME="rel_prompt"
