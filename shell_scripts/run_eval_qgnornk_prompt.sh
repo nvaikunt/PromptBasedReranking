@@ -5,7 +5,7 @@
 #SBATCH --time=30:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:v100:1
+#SBATCH --gres=gpu:2
 #SBATCH --export=ALL
 source /home/nvaikunt/miniconda3/etc/profile.d/conda.sh
 conda activate baseline
