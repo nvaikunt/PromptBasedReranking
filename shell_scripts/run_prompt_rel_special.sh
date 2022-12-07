@@ -19,6 +19,6 @@ export VAL_SZ=10
 export RUN_NAME="rel_prompt"
 export RANKING=FALSE
 export QG=FALSE
-export MODEL=/projects/tir5/users/nvaikunt/qgen_rnk_exp/prompt_model/checkpoint-35000
+export MODEL=/projects/tir5/users/nvaikunt/rel_nornk_exp/prompt_model/checkpoint-35000
 export OUTPUT_DIR=/projects/tir5/users/nvaikunt/rel_nornk_exp/prompt_model
 bash shell_scripts/run_prompt_tuning.sh
