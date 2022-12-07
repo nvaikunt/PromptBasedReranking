@@ -10,7 +10,7 @@
 source /home/nvaikunt/miniconda3/etc/profile.d/conda.sh
 conda activate baseline
 cd /home/nvaikunt/PromptBasedReRanking
-export PER_GPU_BATCH_SZ=8
+export PER_GPU_BATCH_SZ=4
 export MODEL=16
 export LR=1e-3
 export N_EPOCHS=2
