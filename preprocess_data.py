@@ -18,9 +18,9 @@ def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz:
     full_dataset = datasets.load_dataset("json", data_files=data_filepath, split="train",
                                          cache_dir='/projects/tir5/users/nvaikunt/')
     full_dataset = full_dataset.map(partial(create_pos_txt_col, k=20,
-                                            txt_database=evidence_txt), num_proc=4, load_from_cache_file=False)
+                                            txt_database=evidence_txt), num_proc=4)
     full_dataset = full_dataset.map(partial(create_pos_neg_txt_col, k=(20 // 2),
-                                            txt_database=evidence_txt), num_proc=4, load_from_cache_file=False)
+                                            txt_database=evidence_txt), num_proc=4)
     if not isQG:
         train_creation_fct = create_ranking_loss_baseline_examples
         drop_col = "k_pos_neg"
@@ -36,12 +36,10 @@ def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz:
     train_dataset = datasets.Dataset.from_dict(train_dict)
     if is_prompt:
         train_dataset = train_dataset.map(partial(preprocess_func_soft_prompt, tokenizer=tokenizer, n_tokens=n_tokens,
-                                                  max_input_length=412, max_target_length=50), batched=True,
-                                          load_from_cache_file=False)
+                                                  max_input_length=412, max_target_length=50), batched=True)
     else:
         train_dataset = train_dataset.map(partial(preprocess_function, tokenizer=tokenizer,
-                                                  max_input_length=512, max_target_length=50), batched=True,
-                                          load_from_cache_file=False)
+                                                  max_input_length=512, max_target_length=50), batched=True)
 
     train_dataset = train_dataset.remove_columns(["inputs", "targets", drop_col])
     train_dataset.set_format(type="torch")
