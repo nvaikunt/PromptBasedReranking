@@ -16,7 +16,7 @@ def create_training_dataset(data_filepath: str, evidence_filepath: str, data_sz:
         disable_progress_bar()
     evidence_txt = create_evidence_texts(evidence_filepath)
     full_dataset = datasets.load_dataset("json", data_files=data_filepath, split="train",
-                                         cache_dir='/projects/tir5/users/nvaikunt/')
+                                         cache_dir='/projects/tir5/users/nvaikunt/cache_test')
     full_dataset = full_dataset.map(partial(create_pos_txt_col, k=20,
                                             txt_database=evidence_txt), num_proc=4)
     full_dataset = full_dataset.map(partial(create_pos_neg_txt_col, k=(20 // 2),
