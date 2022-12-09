@@ -4,7 +4,7 @@ import datasets
 
 def create_evidence_texts(data_filepath: str, delimiter="\t", file_type="csv") -> datasets.Dataset:
     return datasets.load_dataset(file_type, data_files=data_filepath, split="train", delimiter=delimiter,
-                                 download_mode='force_redownload')
+                                 cache_dir='/projects/tir5/users/nvaikunt/')
 
 
 def get_top_k_pos(row, k: int, txt_database: datasets.Dataset) -> list:
