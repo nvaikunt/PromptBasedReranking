@@ -52,7 +52,7 @@ def create_eval_dataset(data_filepath: str, evidence_filepath: str, data_sz: int
         disable_progress_bar()
     evidence_txt = create_evidence_texts(evidence_filepath)
     full_dataset = datasets.load_dataset("json", data_files=data_filepath, split="train",
-                                         cache_dir='/projects/tir5/users/nvaikunt/cache_eval')
+                                         cache_dir='/projects/tir5/users/nvaikunt/cache_eval2')
     if data_sz > len(full_dataset):
         data_sz = len(full_dataset)
     eval_dataset = full_dataset.select(range(data_sz))
